@@ -16,22 +16,17 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.utils import to_categorical
 from sklearn.metrics import confusion_matrix, classification_report
 
-# Step 2: Load and preprocess data
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
-# Normalize the data to range [0, 1]
 x_train = x_train.astype('float32') / 255.0
 x_test = x_test.astype('float32') / 255.0
 
-# Reshape data to add channel dimension (grayscale = 1 channel)
 x_train = x_train.reshape(-1, 28, 28, 1)
 x_test = x_test.reshape(-1, 28, 28, 1)
 
-# One-hot encode the labels
 y_train_cat = to_categorical(y_train, num_classes=10)
 y_test_cat = to_categorical(y_test, num_classes=10)
 
-# Step 3: Build the CNN model
 model = Sequential([
     Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(28, 28, 1)),
     MaxPooling2D(pool_size=(2, 2)),
@@ -39,34 +34,26 @@ model = Sequential([
     MaxPooling2D(pool_size=(2, 2)),
     Flatten(),
     Dense(128, activation='relu'),
-    Dense(10, activation='softmax')  # 10 output neurons for 10 classes
+    Dense(10, activation='softmax')  
 ])
-
-# Step 4: Compile the model
 model.compile(optimizer='adam',
               loss='categorical_crossentropy',
               metrics=['accuracy'])
 
-# Step 5: Train the model
 history = model.fit(x_train, y_train_cat,
                     epochs=10,
                     batch_size=64,
                     validation_split=0.1,
                     verbose=2)
-
-# Step 6: Evaluate the model on test data
 test_loss, test_acc = model.evaluate(x_test, y_test_cat, verbose=0)
 print(f"Test Accuracy: {test_acc:.4f}")
 
-# Step 7: Make predictions and evaluate
 y_pred = model.predict(x_test, verbose=0)
-y_pred_classes = np.argmax(y_pred, axis=1)  # Predicted class labels
-y_true = np.argmax(y_test_cat, axis=1)      # True class labels
+y_pred_classes = np.argmax(y_pred, axis=1)  
+y_true = np.argmax(y_test_cat, axis=1)      
 
-# Confusion matrix
 conf_matrix = confusion_matrix(y_true, y_pred_classes)
 
-# Visualization of confusion matrix
 plt.figure(figsize=(8, 6))
 sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues')
 plt.title("Confusion Matrix")
@@ -74,7 +61,6 @@ plt.xlabel("Predicted Label")
 plt.ylabel("True Label")
 plt.show()
 
-# Classification report
 print("\nClassification Report:\n")
 print(classification_report(y_true, y_pred_classes))
 
